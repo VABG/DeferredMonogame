@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net9.0-windows</TargetFramework>
+        <RollForward>Major</RollForward>
+        <PublishReadyToRun>false</PublishReadyToRun>
+        <TieredCompilation>false</TieredCompilation>
+        <UseWindowsForms>true</UseWindowsForms>
+        <LangVersion>13</LangVersion>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    <PropertyGroup>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <ApplicationIcon>Icon.ico</ApplicationIcon>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.*"/>
+        <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.*"/>
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="Content\Shaders\DeferredPixel.hlsl" />
+      <None Include="Content\Shaders\DeferredShared.hlsl" />
+      <None Include="Content\Shaders\Vertex3D.hlsl" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Content\Models\Knight\" />
+    </ItemGroup>
+    <ItemGroup>
+      <ClCompile Include="Content\Shaders\Deferred.fx" />
+      <ClCompile Include="Content\Shaders\DirectionalLight.fx" />
+      <ClCompile Include="Content\Shaders\PBRShared.hlsl" />
+    </ItemGroup>
+</Project>
