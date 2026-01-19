@@ -59,9 +59,9 @@ float4 MainPS(VertexShaderOutput input) : SV_Target
     float4 specularGlow = tex2D(SpecularGlowSampler,coords);
     float4 worldSpace = tex2D(WorldSpaceSampler,coords);
     float3 dir = normalize(CameraPosition - worldSpace.xyz);
-    float3 shaded =ShadePixelPBS(LightDirection, 
+    float3 shaded =ShadePixelPBS(-LightDirection, 
         dir, 
-        LightColorStrength.xyz, 
+        LightColorStrength.xyz * 2.0f, 
         albedo, 
         normalsGloss, 
         specularGlow);
