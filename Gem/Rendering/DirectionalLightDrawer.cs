@@ -21,8 +21,12 @@ public class DirectionalLightDrawer
     public void Draw(Texture2D albedo,
         Texture2D normalsGloss,
         Texture2D specularGlow,
-        Texture2D worldSpace, Camera3D camera)
+        Texture2D worldSpace, 
+        TextureCube cubeMap,
+        Camera3D camera)
     {
+        _effect.Parameters["CubeMap"].SetValue(cubeMap);
+        _effect.Parameters["CubeMapLevelCount"].SetValue(cubeMap.LevelCount);
         _effect.Parameters["Albedo"].SetValue(albedo);
         _effect.Parameters["NormalsGloss"].SetValue(normalsGloss);
         _effect.Parameters["SpecularGlow"].SetValue(specularGlow);

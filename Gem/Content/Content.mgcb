@@ -92,3 +92,8 @@
 /processorParam:DebugMode=Auto
 /build:Shaders/DirectionalLight.fx
 
+#begin Textures/cubemap_test.dds
+/importer:TextureImporter
+/processor:PassThroughProcessor
+/build:Textures/cubemap_test.dds
+

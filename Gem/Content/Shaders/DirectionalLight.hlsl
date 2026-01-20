@@ -4,32 +4,15 @@ Texture2D Albedo : register(t0);
 Texture2D NormalsGloss: register(t1);
 Texture2D SpecularGlow: register(t2);
 Texture2D WorldSpace: register(t3);
+TextureCube<float4> CubeMap : register(t4);
+float CubeMapLevelCount; 
 
 float3 LightDirection;
 float4 LightColorStrength;
 float3 CameraPosition;
 
-//TODO: Shadow map somehow
-
-sampler2D AlbedoSampler = sampler_state
-{
-    Texture = <Albedo>;
-};
-
-sampler2D NormalsGlossSampler = sampler_state
-{
-    Texture = <NormalsGloss>;
-};
-
-sampler2D SpecularGlowSampler = sampler_state
-{
-    Texture = <SpecularGlow>;
-};
-
-sampler2D WorldSpaceSampler = sampler_state
-{
-    Texture = <WorldSpace>;
-};
+//TODO: Shadow map(s) somehow
+SamplerState Sampler : register(s0);
 
 struct VertexShaderInput
 {
@@ -51,13 +34,26 @@ VertexShaderOutput MainVS(VertexShaderInput input)
     return output;
 }
 
+float3 Environment(float4 albedo, float4 normalsGloss, float4 specularGlow, float3 viewDir)
+{
+    float3 reflVec = reflect(viewDir, normalsGloss.xyz);
+    float metallic = 0.95f;
+    float3 irradiance = CubeMap.SampleLevel(Sampler, -normalsGloss.xzy, CubeMapLevelCount).xyz;
+    float3 h = normalize((reflVec + viewDir) * .5f);
+    float f = Fresnel(specularGlow,viewDir,  h);
+    float kd = (float3(1.0f, 1.0f, 1.0f) - f) * (1.0f - metallic);
+    float3 diffuseIBL = kd * albedo.xyz * irradiance;
+    float3 specularIrradiance = CubeMap.SampleLevel(Sampler, -reflVec, normalsGloss.a * f * CubeMapLevelCount).xyz;
+    return (diffuseIBL + specularIrradiance * f * specularGlow.xyz) * .5f;
+}
+
 float4 MainPS(VertexShaderOutput input) : SV_Target
 {
     float2 coords = input.TextureCoordinates;
-    float4 albedo = tex2D(AlbedoSampler,coords);
-    float4 normalsGloss = tex2D(NormalsGlossSampler,coords);
-    float4 specularGlow = tex2D(SpecularGlowSampler,coords);
-    float4 worldSpace = tex2D(WorldSpaceSampler,coords);
+    float4 albedo = Albedo.Sample(Sampler,coords);
+    float4 normalsGloss = NormalsGloss.Sample(Sampler,coords);
+    float4 specularGlow = SpecularGlow.Sample(Sampler,coords);
+    float4 worldSpace = WorldSpace.Sample(Sampler,coords);
     float3 dir = normalize(CameraPosition - worldSpace.xyz);
     float3 shaded =ShadePixelPBS(-LightDirection, 
         dir, 
@@ -66,5 +62,8 @@ float4 MainPS(VertexShaderOutput input) : SV_Target
         normalsGloss, 
         specularGlow);
     
-    return float4(shaded, 1.0f);
+    float3 environment =Environment(albedo, normalsGloss, specularGlow, dir) * .5f;
+   
+    return float4(shaded + environment, 1.0f) ;
 }
+

@@ -15,7 +15,7 @@ public class Game1 : Game
     private RenderTarget2D _normalsGloss;
     private RenderTarget2D _specularGlow;
     private RenderTarget2D _worldSpace;
-
+    private TextureCube _cubeMap;
     private RenderTarget2D _gather;
 
     private Camera3D _camera;
@@ -75,12 +75,12 @@ public class Game1 : Game
         var specGloss = Content.Load<Texture2D>("Models/Knight/Knight_mr");
         var norm = Content.Load<Texture2D>("Models/Knight/Knight_n");
         var glow = Content.Load<Texture2D>("Models/Knight/Knight_g");
-
-
+        _cubeMap = Content.Load<TextureCube>("Textures/cubemap_test");
+        
         var dirLight = new DirLight
         {
             Direction = Vector3.Down,
-            Color = new Vector4(1, 1, 1, 1)
+            Color = new Vector4(1, 0.96f, 0.9f, 1)
         };
         _dirLight = new DirectionalLightDrawer(GraphicsDevice, dirLight, _directionalLight);
         _model = new Model3D(alb, norm, specGloss, glow, model);
@@ -116,14 +116,15 @@ public class Game1 : Game
             _camera.RotateY(-moveAmount / 10f);
         _camera.Update();
 
+        const float rotationSpeed = 0.1f;
         if (_newState.IsKeyDown(Keys.Left))
-            _dirLight.Rotate(Vector3.Left *.2f);
+            _dirLight.Rotate(Vector3.Left * rotationSpeed);
         if (_newState.IsKeyDown(Keys.Right))
-            _dirLight.Rotate(Vector3.Right*.2f);
+            _dirLight.Rotate(Vector3.Right* rotationSpeed);
         if (_newState.IsKeyDown(Keys.Up))
-            _dirLight.Rotate(Vector3.Forward *.2f);
+            _dirLight.Rotate(Vector3.Forward * rotationSpeed);
         if (_newState.IsKeyDown(Keys.Down))
-            _dirLight.Rotate(Vector3.Backward *.2f);
+            _dirLight.Rotate(Vector3.Backward * rotationSpeed);
         _oldState = _newState;
         
         
@@ -145,17 +146,16 @@ public class Game1 : Game
 
     private void DrawLighting()
     {
-        GraphicsDevice.SetRenderTarget(_gather);
-        GraphicsDevice.Clear(Color.DarkRed);
-        GraphicsDevice.BlendState = BlendState.NonPremultiplied;
-        GraphicsDevice.DepthStencilState = DepthStencilState.None;
-        _dirLight.Draw(_albedo, _normalsGloss, _specularGlow, _worldSpace, _camera);
-
         GraphicsDevice.SetRenderTarget(null);
-        _spriteBatch.Begin();
-        _spriteBatch.Draw(_gather,
-            Vector2.Zero, Color.White);
-        _spriteBatch.End();
+        GraphicsDevice.Clear(Color.Black);
+        GraphicsDevice.BlendState = BlendState.Additive;
+        GraphicsDevice.DepthStencilState = DepthStencilState.None;
+        _dirLight.Draw(_albedo, _normalsGloss, _specularGlow, _worldSpace,  _cubeMap, _camera);
+        GraphicsDevice.SetRenderTarget(null);
+        //_spriteBatch.Begin();
+        //_spriteBatch.Draw(_gather,
+        //    Vector2.Zero, Color.White);
+        //_spriteBatch.End();
     }
 
     private void DrawDeferredPass()
