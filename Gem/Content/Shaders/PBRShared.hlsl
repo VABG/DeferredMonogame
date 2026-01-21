@@ -8,7 +8,7 @@ float GetMaxOrMinimumValue(float value)
     return max(value, 0.000001);
 }
 
-float Fresnel(float3 reflectivity, float3 view, float3 halfVector)
+float3 Fresnel(float3 reflectivity, float3 view, float3 halfVector)
 {
     return reflectivity + (float3(1.0f, 1.0f, 1.0f) - reflectivity) * pow(1.0f - saturate(dot(view, halfVector)), 5.0f);
 }
@@ -41,29 +41,30 @@ float LightDistribution(float roughness, float3 normal, float3 halfVector)
     return numerator / denominator;
 }
 
-float3 ShadePixelPBS(float3 lightDirection, float3 viewDirection, float3 lightColor, 
-    float4 albedo, float4 normalGloss, float4 specularGlow)
+float3 ShadePixelPBS(float3 lightDirection, float3 viewDirection, float3 lightColor,
+                     float4 albedo, float4 normalGloss, float4 specularGlow)
 {
-    float metallic = 0.95f;
+    //float metallic = 0.95f;
+    float roughness = (1.0f - normalGloss.w);
     float3 h = normalize((lightDirection + viewDirection) * .5f);
-    float3 ks = Fresnel(specularGlow.xyz * normalGloss.w, viewDirection, h);
-    float kd = (float3(1.0f, 1.0f, 1.0f) - ks) * (1.0f - metallic);
-    
+    float3 ks = Fresnel(specularGlow.xyz * roughness, viewDirection, h);
+    float kd = (float3(1.0f, 1.0f, 1.0f) - ks);// * (1.0f - metallic);
+
     float3 lambert = albedo.xyz / pi;
-    
-    float r = normalGloss.w;
+
     float3 n = normalGloss.xyz;
-    
-    float lambertShading = dot(lightDirection, n);
-    
-    float cookTorranceN = LightDistribution(r, n, h) * SmithModel(r, n, viewDirection, lightDirection);
+
+    float lambertShading = saturate(dot(lightDirection, n));
+
+    float3 cookTorranceN = LightDistribution(roughness, n, h)
+        * SmithModel(roughness, n, viewDirection, lightDirection)
+        * ks;
     float cookTorranceD = 4.0f * saturate(dot(viewDirection, n)) * lambertShading;
     cookTorranceD = GetMaxOrMinimumValue(cookTorranceD);
-    float cookTorrance = cookTorranceN / cookTorranceD;
-    float3 cookTorranceColor = specularGlow.xyz * cookTorrance;
-    
-    float3 BRDF = kd * lambert + cookTorranceColor;
-    
+    float3 cookTorrance = cookTorranceN / cookTorranceD;
+
+    float3 BRDF = kd * lambert + cookTorrance;
+
     //TODO: Return glow too
     return BRDF * lightColor * lambertShading;
 }
