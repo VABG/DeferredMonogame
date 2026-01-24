@@ -28,6 +28,9 @@
     <ItemGroup>
       <ClCompile Include="Content\Shaders\Deferred.fx" />
       <ClCompile Include="Content\Shaders\DirectionalLight.fx" />
+      <ClCompile Include="Content\Shaders\MotionBlur.fx" />
+      <ClCompile Include="Content\Shaders\MotionBlur.hlsl" />
       <ClCompile Include="Content\Shaders\PBRShared.hlsl" />
+      <ClCompile Include="Content\Shaders\ShadowPass.fx" />
     </ItemGroup>
 </Project>

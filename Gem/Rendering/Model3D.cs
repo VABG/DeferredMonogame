@@ -14,8 +14,9 @@ public class Model3D
     private readonly Texture2D _specularGloss;
     private readonly Texture2D _glow;
     private Matrix _transform;
-    private SamplerState _samplerState;
-    public readonly Model Model;
+    private Matrix _lastWorldViewProjection;
+    private readonly SamplerState _samplerState;
+    private readonly Model _model;
 
     public Model3D(Texture2D albedo, Texture2D normal, Texture2D specularGloss, Texture2D glow, Model model)
     {
@@ -24,7 +25,7 @@ public class Model3D
         _normal = normal;
         _specularGloss = specularGloss;
         _glow = glow;
-        Model = model;
+        _model = model;
 
         _samplerState = new SamplerState();
         
@@ -58,15 +59,19 @@ public class Model3D
     
     public void Draw(Effect effect, Camera3D camera, GraphicsDevice graphics)
     {
+        var worldViewProjection = GetWorldViewProjectionMatrix(camera);
         graphics.SamplerStates[0] =  _samplerState;
+        // TODO: Move camera position to global buffer
         effect.Parameters["CameraPosition"].SetValue(camera.Transform.Translation);
-        effect.Parameters["ModelViewProjection"].SetValue(GetWorldViewProjectionMatrix(camera));
-        effect.Parameters["ModelToWorld"].SetValue(Matrix.Transpose(GetWorldMatrix()));
+        effect.Parameters["ModelViewProjection"].SetValue(worldViewProjection);
+        effect.Parameters["LastModelViewProjection"].SetValue(_lastWorldViewProjection);
+        effect.Parameters["ModelToWorld"].SetValue(_transform);
         effect.Parameters["AlbedoTexture"].SetValue(_albedo);
         effect.Parameters["NormalsTexture"].SetValue(_normal);
         effect.Parameters["SpecularGlossTexture"].SetValue(_specularGloss);
         effect.Parameters["GlowTexture"].SetValue(_glow);
-        foreach (var mesh in Model.Meshes)
+        
+        foreach (var mesh in _model.Meshes)
         {
             foreach (var meshPart in mesh.MeshParts)
             {
@@ -79,6 +84,8 @@ public class Model3D
                 }
             }
         }
+
+        _lastWorldViewProjection = worldViewProjection;
     }
 }
 

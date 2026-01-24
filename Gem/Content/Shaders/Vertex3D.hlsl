@@ -1,6 +1,7 @@
 #include "DeferredShared.hlsl"
 
 matrix ModelViewProjection;
+matrix LastModelViewProjection;
 matrix ModelToWorld;
 
 struct VertexShaderInput
@@ -15,12 +16,18 @@ struct VertexShaderInput
 VertexShaderOutput MainVS(in VertexShaderInput input)
 {
     VertexShaderOutput output;
-    output.Position = mul(float4(input.Position, 1), ModelViewProjection);
+    float4 pos = mul(float4(input.Position, 1), ModelViewProjection);
+    output.Position = pos;
+    // Can't use output.Position for some reason, maybe some haxx exist? Or I misread the valjoos?
+    output.CurrentPosition = pos; 
+    output.PreviousPosition = mul(float4(input.Position, 1), LastModelViewProjection);
     output.WorldPosition = mul(float4(input.Position, 1), ModelToWorld).xyz;
     output.TexCoord = input.TexCoord;
     
-    output.Normal = normalize(mul(float4(input.Normal, 1), ModelToWorld).xyz);
-    output.Tangent = normalize(mul(float4(input.Tangent, 1), ModelToWorld).xyz);
-    output.Binormal =  normalize(mul(float4(input.Binormal, 1), ModelToWorld).xyz);
+    float3x3 rotationMatrix = ModelToWorld;
+    
+    output.Normal = normalize(mul(float4(input.Normal, 1), rotationMatrix).xyz);
+    output.Tangent = normalize(mul(float4(input.Tangent, 1), rotationMatrix).xyz);
+    output.Binormal =  normalize(mul(float4(input.Binormal, 1), rotationMatrix).xyz);
     return output;
 }
