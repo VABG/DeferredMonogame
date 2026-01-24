@@ -24,6 +24,8 @@ public class DeferredRenderPass
     private Effect _directionalLight;
     public DirectionalLightDrawer DirLight {get; private set;}
     public MotionBlurDrawer MotionBlur {get; private set;}
+    private SamplerState _samplerState;
+    
     private readonly GraphicsDevice _graphicsDevice;
     public bool DebugDrawRenderPasses;
 
@@ -72,7 +74,15 @@ public class DeferredRenderPass
         _gather = new RenderTarget2D(_graphics.GraphicsDevice, _graphics.PreferredBackBufferWidth,
             _graphics.PreferredBackBufferHeight, false, SurfaceFormat.HdrBlendable, DepthFormat.None);
         _motionVectors = new RenderTarget2D(_graphics.GraphicsDevice, _graphics.PreferredBackBufferWidth,
-            _graphics.PreferredBackBufferHeight, false, SurfaceFormat.Vector2, DepthFormat.None);
+            _graphics.PreferredBackBufferHeight, false, SurfaceFormat.HalfVector2, DepthFormat.None);
+
+        _samplerState = new SamplerState()
+        {
+            AddressU = TextureAddressMode.Clamp,
+            AddressW = TextureAddressMode.Clamp,
+            AddressV = TextureAddressMode.Clamp,
+            Filter = TextureFilter.Linear,
+        };
     }
 
     public void Draw(Camera3D camera, List<Model3D> models)
@@ -104,6 +114,7 @@ public class DeferredRenderPass
 
     private void DrawPostProcessing()
     {
+        _graphicsDevice.SamplerStates[0] =  _samplerState;
         _graphicsDevice.SetRenderTarget(null);
         _graphicsDevice.BlendState = BlendState.Opaque;
         MotionBlur.Draw(_motionVectors, _gather);
