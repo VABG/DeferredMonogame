@@ -8,6 +8,7 @@ public class DirectionalLightDrawer
     public DirLight DirLight { get; }
     private readonly GraphicsDevice _graphicsDevice;
     private readonly Effect _effect;
+    ShadowDrawer _shadowDrawer;
     
     private readonly FullScreenRectangle _rect;
     public DirectionalLightDrawer(GraphicsDevice graphicsDevice, DirLight dirLight, Effect dirLightEffect)
@@ -17,11 +18,17 @@ public class DirectionalLightDrawer
         DirLight = dirLight;
         _rect = new FullScreenRectangle();
     }
+
+    public void DrawShadow()
+    {
+        
+    }
     
     public void Draw(Texture2D albedo,
         Texture2D normalsGloss,
         Texture2D specularGlow,
-        Texture2D worldSpace, 
+        Texture2D worldSpace,
+        Texture2D ao,
         TextureCube cubeMap,
         Camera3D camera)
     {
@@ -31,6 +38,7 @@ public class DirectionalLightDrawer
         _effect.Parameters["NormalsGloss"].SetValue(normalsGloss);
         _effect.Parameters["SpecularGlow"].SetValue(specularGlow);
         _effect.Parameters["WorldSpace"].SetValue(worldSpace);
+        _effect.Parameters["AO"].SetValue(ao);
         _effect.Parameters["LightDirection"].SetValue(DirLight.Direction);
         _effect.Parameters["LightColorStrength"].SetValue(DirLight.Color);
         _effect.Parameters["CameraPosition"].SetValue(camera.Transform.Translation);

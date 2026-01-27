@@ -68,8 +68,6 @@ public class Camera3D
         }
     }
 
-    public Matrix GetWorldToViewMatrix => Matrix.Transpose(GetViewMatrix);
-
     private Matrix GetProjectionMatrix
     {
         get

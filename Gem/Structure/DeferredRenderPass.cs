@@ -23,6 +23,8 @@ public class DeferredRenderPass
     private Effect _deferredPass;
     private Effect _directionalLight;
     public DirectionalLightDrawer DirLight {get; private set;}
+    private AmbientOcclusionDrawer _ambientOcclusionDrawer;
+    private readonly BlendState _multiplyBlendState = new() { ColorSourceBlend = Blend.DestinationColor, ColorDestinationBlend = Blend.Zero };
     public MotionBlurDrawer MotionBlur {get; private set;}
     private SamplerState _samplerState;
     
@@ -43,7 +45,6 @@ public class DeferredRenderPass
     private void Load()
     {
         _cubeMap = _content.Load<TextureCube>("Textures/cubemap_test");
-
         _deferredPass = _content.Load<Effect>("Shaders/Deferred");
         var directionalLight = _content.Load<Effect>("Shaders/DirectionalLight");
         var dirLight = new DirLight
@@ -56,6 +57,9 @@ public class DeferredRenderPass
         var blurEffect = _content.Load<Effect>("Shaders/MotionBlur");
 
         MotionBlur = new MotionBlurDrawer(_graphics.GraphicsDevice, blurEffect);
+        
+        var aoShader = _content.Load<Effect>("Shaders/SSAO");
+        _ambientOcclusionDrawer = new AmbientOcclusionDrawer(_graphicsDevice, aoShader);
 
     }
 
@@ -89,7 +93,8 @@ public class DeferredRenderPass
     {
         // TODO: Get latest camera info and ensure the camera buffer is up to date
         DrawDeferredPass(camera, models);
-
+        
+        _ambientOcclusionDrawer.Draw(_normalsGloss, _worldSpace, camera);
         if (DebugDrawRenderPasses)
             DrawDebugPasses();
         else
@@ -104,7 +109,7 @@ public class DeferredRenderPass
         _graphicsDevice.SetRenderTarget(_gather);
         _graphicsDevice.Clear(Color.Black);
         _graphicsDevice.BlendState = BlendState.Additive;
-        DirLight.Draw(_albedo, _normalsGloss, _specularGlow, _worldSpace, _cubeMap, camera);
+        DirLight.Draw(_albedo, _normalsGloss, _specularGlow, _worldSpace, _ambientOcclusionDrawer.Ao, _cubeMap, camera);
         _graphicsDevice.SetRenderTarget(null);
         //_spriteBatch.Begin();
         //_spriteBatch.Draw(_gather,
@@ -114,8 +119,7 @@ public class DeferredRenderPass
 
     private void DrawPostProcessing()
     {
-        _graphicsDevice.SamplerStates[0] =  _samplerState;
-        _graphicsDevice.SetRenderTarget(null);
+        _graphicsDevice.SamplerStates[0] = _samplerState;
         _graphicsDevice.BlendState = BlendState.Opaque;
         MotionBlur.Draw(_motionVectors, _gather);
     }
@@ -148,10 +152,10 @@ public class DeferredRenderPass
             new Vector2(_graphics.PreferredBackBufferWidth / 2.0f, 0),
             null, Color.White, 0, Vector2.Zero,
             new Vector2(0.5f), SpriteEffects.None, 0);
-        _spriteBatch.Draw(_motionVectors, new Vector2(0, _graphics.PreferredBackBufferHeight / 2.0f),
+        _spriteBatch.Draw(_worldSpace, new Vector2(0, _graphics.PreferredBackBufferHeight / 2.0f),
             null, Color.White, 0, Vector2.Zero,
             new Vector2(0.5f), SpriteEffects.None, 0);
-        _spriteBatch.Draw(_worldSpace,
+        _spriteBatch.Draw(_ambientOcclusionDrawer.Ao,
             new Vector2(_graphics.PreferredBackBufferWidth / 2.0f, _graphics.PreferredBackBufferHeight / 2.0f),
             null, Color.White, 0, Vector2.Zero,
             new Vector2(0.5f), SpriteEffects.None, 0);

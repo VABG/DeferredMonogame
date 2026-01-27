@@ -105,6 +105,12 @@
 /processorParam:DebugMode=Auto
 /build:Shaders/MotionBlur.fx
 
+#begin Shaders/SSAO.fx
+/importer:EffectImporter
+/processor:EffectProcessor
+/processorParam:DebugMode=Auto
+/build:Shaders/SSAO.fx
+
 #begin Textures/cubemap_test.dds
 /importer:TextureImporter
 /processor:PassThroughProcessor

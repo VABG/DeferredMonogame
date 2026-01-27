@@ -8,5 +8,6 @@ public class Object3D
     private Quaternion _rotation;
     private Vector3 _scale;
     
-    
+    private Matrix _transform;
+    private Matrix _lastWorldViewProjection;
 }

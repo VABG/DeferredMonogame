@@ -37,7 +37,7 @@ public class Scene
         float dt = (float)gameTime.ElapsedGameTime.TotalSeconds;
         _newState = Keyboard.GetState();
 
-        _knight.Rotate(Vector3.Up, dt * 1.0f);
+        //_knight.Rotate(Vector3.Up, dt * 1.0f);
         _knight2.Rotate(Vector3.Up, dt * -2.5f);
 
         if (_newState.IsKeyDown(Keys.L) && !_oldState.IsKeyDown(Keys.L))

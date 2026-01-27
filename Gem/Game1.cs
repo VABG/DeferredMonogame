@@ -21,8 +21,8 @@ public class Game1 : Game
         _graphics = new GraphicsDeviceManager(this)
         {
             GraphicsProfile = GraphicsProfile.HiDef,
-            PreferredBackBufferWidth = 1024,
-            PreferredBackBufferHeight = 1024,
+            PreferredBackBufferWidth = 1920,
+            PreferredBackBufferHeight = 1080,
             PreferMultiSampling = false,
             SynchronizeWithVerticalRetrace = true,
             IsFullScreen = false,

@@ -32,5 +32,8 @@
       <ClCompile Include="Content\Shaders\MotionBlur.hlsl" />
       <ClCompile Include="Content\Shaders\PBRShared.hlsl" />
       <ClCompile Include="Content\Shaders\ShadowPass.fx" />
+      <ClCompile Include="Content\Shaders\ShadowPass.hlsl" />
+      <ClCompile Include="Content\Shaders\SSAO.fx" />
+      <ClCompile Include="Content\Shaders\SSAO.hlsl" />
     </ItemGroup>
 </Project>
