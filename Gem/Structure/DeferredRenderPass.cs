@@ -21,7 +21,6 @@ public class DeferredRenderPass
     private RenderTarget2D _gather;
 
     private Effect _deferredPass;
-    private Effect _directionalLight;
     public DirectionalLightDrawer DirLight {get; private set;}
     private AmbientOcclusionDrawer _ambientOcclusionDrawer;
     private readonly BlendState _multiplyBlendState = new() { ColorSourceBlend = Blend.DestinationColor, ColorDestinationBlend = Blend.Zero };
@@ -92,6 +91,7 @@ public class DeferredRenderPass
     public void Draw(Camera3D camera, List<Model3D> models)
     {
         // TODO: Get latest camera info and ensure the camera buffer is up to date
+        DirLight.DrawShadow(models.ToArray());
         DrawDeferredPass(camera, models);
         
         _ambientOcclusionDrawer.Draw(_normalsGloss, _worldSpace, camera);

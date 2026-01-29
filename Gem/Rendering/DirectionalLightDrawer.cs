@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SharpDX.Direct2D1.Effects;
 
 namespace Gem.Rendering;
 
@@ -8,20 +9,21 @@ public class DirectionalLightDrawer
     public DirLight DirLight { get; }
     private readonly GraphicsDevice _graphicsDevice;
     private readonly Effect _effect;
-    ShadowDrawer _shadowDrawer;
+    private ShadowDrawer? _shadowDrawer;
     
     private readonly FullScreenRectangle _rect;
-    public DirectionalLightDrawer(GraphicsDevice graphicsDevice, DirLight dirLight, Effect dirLightEffect)
+    public DirectionalLightDrawer(GraphicsDevice graphicsDevice, DirLight dirLight, Effect dirLightEffect, ShadowDrawer? shadowDrawer = null)
     {
         _graphicsDevice = graphicsDevice;
         _effect = dirLightEffect;
         DirLight = dirLight;
         _rect = new FullScreenRectangle();
+        _shadowDrawer = shadowDrawer;
     }
 
-    public void DrawShadow()
+    public void DrawShadow(Model3D[] models)
     {
-        
+        _shadowDrawer?.Draw(models);
     }
     
     public void Draw(Texture2D albedo,

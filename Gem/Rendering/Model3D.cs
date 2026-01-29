@@ -1,4 +1,3 @@
-using System.Drawing;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -86,6 +85,28 @@ public class Model3D
         }
 
         _lastWorldViewProjection = worldViewProjection;
+    }
+
+    public void DrawShadow(Effect effect, Camera3D camera, GraphicsDevice graphics)
+    {
+        var worldViewProjection = GetWorldViewProjectionMatrix(camera);
+        effect.Parameters["CameraPosition"].SetValue(camera.Transform.Translation);
+        effect.Parameters["ModelViewProjection"].SetValue(worldViewProjection);
+        effect.Parameters["ModelToWorld"].SetValue(_transform);
+        
+        foreach (var mesh in _model.Meshes)
+        {
+            foreach (var meshPart in mesh.MeshParts)
+            {
+                graphics.SetVertexBuffer(meshPart.VertexBuffer);
+                graphics.Indices = meshPart.IndexBuffer;
+                foreach (var pass in effect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    graphics.DrawIndexedPrimitives(PrimitiveType.TriangleList, meshPart.VertexOffset, meshPart.StartIndex, meshPart.PrimitiveCount);                    
+                }
+            }
+        }
     }
 }
 
