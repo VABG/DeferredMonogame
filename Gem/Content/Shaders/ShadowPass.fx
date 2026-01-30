@@ -1,5 +1,4 @@
-#define VS_SHADERMODEL vs_5_0
-#define PS_SHADERMODEL ps_5_0
+#include "ShaderModel.hlsl"
 
 #include "ShadowPass.hlsl"
 

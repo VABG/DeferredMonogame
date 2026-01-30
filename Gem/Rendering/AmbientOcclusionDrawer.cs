@@ -57,7 +57,7 @@ public class AmbientOcclusionDrawer
             
 
             var scale = i / 1.0f;
-            scale = MathHelper.Lerp(0.1f, 1.0f, scale * scale);
+            scale = MathHelper.Lerp(0.05f, 1.0f, scale * scale);
             _hemisphereSamples[i] *= scale;
         }
     }

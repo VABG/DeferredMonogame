@@ -35,7 +35,7 @@ public class FrameRateUI
         _graphicsDevice.SetRenderTarget(null);
         _graphicsDevice.BlendState = BlendState.Opaque;
         _spriteBatch.Begin();
-        _spriteBatch.DrawString(_font, $"{(int)_currentFps}",  new Vector2(2, 2), Color.White);
+        _spriteBatch.DrawString(_font, $"{(int)_currentFps}",  new Vector2(10, 2), Color.White);
         _spriteBatch.End();
     }
 }

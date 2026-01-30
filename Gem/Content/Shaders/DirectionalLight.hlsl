@@ -71,7 +71,7 @@ float4 MainPS(VertexShaderOutput input) : SV_Target
                                   normalsGloss,
                                   specularGlow);
 
-    float3 environment = Environment(albedo, normalsGloss, specularGlow, dir) * 0.25f * ao * ao;
+    float3 environment = Environment(albedo, normalsGloss, specularGlow, dir) * 0.25f * ao;
 
     return float4(shaded + environment, 1.0f);
 }

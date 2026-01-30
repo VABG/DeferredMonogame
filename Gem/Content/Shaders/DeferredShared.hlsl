@@ -1,11 +1,3 @@
-#ifndef VS_SHADERMODEL
-#define VS_SHADERMODEL vs_5_0
-#endif
-
-#ifndef PS_SHADERMODEL
-#define PS_SHADERMODEL ps_5_0
-#endif
-
 #ifndef COMMON_STRUCTS
 #define COMMON_STRUCTS
 

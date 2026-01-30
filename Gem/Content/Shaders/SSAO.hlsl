@@ -58,7 +58,7 @@ float4 MainPS(VertexShaderOutput input) : SV_Target
     for (int i = 0; i < 64; ++i)
     {
         float3 rotatedHemi = mul(HemisphereSamples[i] * Scale, tbn);
-        rotatedHemi.y *= -1;
+        rotatedHemi.y *= -1; //WHY THIS MAKE IT BETTER?
         //rotatedHemi.x *= 2.0f;
         float2 sampleLoc = coords + rotatedHemi.xy / (Resolution * depth); 
         float depthAtSample = WorldDepth.Sample(Sampler, sampleLoc).w;

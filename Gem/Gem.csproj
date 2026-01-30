@@ -14,8 +14,8 @@
         <ApplicationIcon>Icon.ico</ApplicationIcon>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.*"/>
         <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.*"/>
+        <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.4.1" />
     </ItemGroup>
     <ItemGroup>
       <None Include="Content\Shaders\DeferredPixel.hlsl" />
@@ -28,9 +28,11 @@
     <ItemGroup>
       <ClCompile Include="Content\Shaders\Deferred.fx" />
       <ClCompile Include="Content\Shaders\DirectionalLight.fx" />
+      <ClCompile Include="Content\Shaders\Lambert.fx" />
       <ClCompile Include="Content\Shaders\MotionBlur.fx" />
       <ClCompile Include="Content\Shaders\MotionBlur.hlsl" />
       <ClCompile Include="Content\Shaders\PBRShared.hlsl" />
+      <ClCompile Include="Content\Shaders\ShaderModel.hlsl" />
       <ClCompile Include="Content\Shaders\ShadowPass.fx" />
       <ClCompile Include="Content\Shaders\ShadowPass.hlsl" />
       <ClCompile Include="Content\Shaders\SSAO.fx" />

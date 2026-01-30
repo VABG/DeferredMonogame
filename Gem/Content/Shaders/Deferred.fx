@@ -1,3 +1,4 @@
+#include "ShaderModel.hlsl"
 #include "DeferredPixel.hlsl"
 #include "Vertex3D.hlsl"
 
