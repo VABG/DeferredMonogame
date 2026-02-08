@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -28,7 +29,7 @@ public class DirectionalLightDrawer
     public void Draw(Texture2D albedo,
         Texture2D normalsGloss,
         Texture2D specularGlow,
-        Texture2D worldSpace,
+        Texture2D depth,
         Texture2D ao,
         TextureCube cubeMap,
         Camera3D camera)
@@ -36,14 +37,18 @@ public class DirectionalLightDrawer
         _effect.Parameters["CubeMap"].SetValue(cubeMap);
         _effect.Parameters["CubeMapLevelCount"].SetValue(cubeMap.LevelCount);
         _effect.Parameters["Albedo"].SetValue(albedo);
-        _effect.Parameters["NormalsGloss"].SetValue(normalsGloss);
-        _effect.Parameters["SpecularGlow"].SetValue(specularGlow);
-        _effect.Parameters["WorldSpace"].SetValue(worldSpace);
+        _effect.Parameters["Normals"].SetValue(normalsGloss);
+        _effect.Parameters["SpecularGloss"].SetValue(specularGlow);
+        _effect.Parameters["Depth"].SetValue(depth);
         _effect.Parameters["AO"].SetValue(ao);
         _effect.Parameters["LightDirection"].SetValue(DirLight.Direction);
         _effect.Parameters["LightColorStrength"].SetValue(DirLight.Color);
-        _effect.Parameters["CameraPosition"].SetValue(camera.Transform.Translation);
-
+        _effect.Parameters["InverseViewTransform"].SetValue(Matrix.Transpose(camera.ViewMatrix));
+        var halfTanFov = (float)Math.Tan(MathHelper.ToRadians(camera.FOV/2.0f));
+        _effect.Parameters["HalfTanFov"].SetValue(halfTanFov);
+        _effect.Parameters["AspectRatio"].SetValue(_graphicsDevice.Viewport.AspectRatio);
+        //_effect.Parameters["FarPlaneDistance"].SetValue(camera.FarClipPlane);
+        //_effect.Parameters["NearPlaneDistance"].SetValue(camera.NearClipPlane);
         var pass = _effect.CurrentTechnique.Passes[0];
         pass.Apply();
         _rect.DrawIndexed(_graphicsDevice);

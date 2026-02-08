@@ -17,7 +17,14 @@ public class AmbientOcclusionDrawer
     
     public AmbientOcclusionDrawer(GraphicsDevice graphicsDevice, Effect aoEffect)
     {
-        Ao = new RenderTarget2D(graphicsDevice, graphicsDevice.Viewport.Width, graphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.DiscardContents);
+        Ao = new RenderTarget2D(graphicsDevice, 
+            graphicsDevice.Viewport.Width, 
+            graphicsDevice.Viewport.Height, 
+            false, 
+            SurfaceFormat.Alpha8, 
+            DepthFormat.None, 
+            0, 
+            RenderTargetUsage.DiscardContents);
         _graphicsDevice = graphicsDevice;
         _effect = aoEffect;
         _rect = new FullScreenRectangle();
@@ -27,16 +34,17 @@ public class AmbientOcclusionDrawer
         _effect.Parameters["Noise"].SetValue(_noise);
     }
 
-    public void Draw(Texture2D normalsGloss,
-        Texture2D worldDepth, Camera3D camera)
+    public void Draw(Texture2D normals,
+        Texture2D depth, 
+        Camera3D camera)
     {
         _graphicsDevice.SetRenderTarget(Ao);
         var viewProjection = camera.ViewMatrix * camera.ProjectionMatrix;
-        _effect.Parameters["NormalsGloss"].SetValue(normalsGloss);
-        _effect.Parameters["WorldDepth"].SetValue(worldDepth);
+        _effect.Parameters["Normals"].SetValue(normals);
+        _effect.Parameters["Depth"].SetValue(depth);
         _effect.Parameters["ViewProjectionMatrix"].SetValue(viewProjection);
         _effect.Parameters["Resolution"].SetValue(new Vector2(Ao.Width, Ao.Height));
-        _effect.Parameters["Scale"].SetValue(0.2f);
+        _effect.Parameters["Scale"].SetValue(0.1f);
         var pass = _effect.CurrentTechnique.Passes[0];
         pass.Apply();
         _rect.DrawIndexed(_graphicsDevice);
@@ -54,10 +62,9 @@ public class AmbientOcclusionDrawer
                 random.NextSingle() * 2 - 1.0f,
                 random.NextSingle());
             _hemisphereSamples[i].Normalize();
-            
 
             var scale = i / 1.0f;
-            scale = MathHelper.Lerp(0.05f, 1.0f, scale * scale);
+            scale = MathHelper.Lerp(0.01f, 1.0f, scale * scale);
             _hemisphereSamples[i] *= scale;
         }
     }

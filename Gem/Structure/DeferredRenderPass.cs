@@ -12,9 +12,9 @@ public class DeferredRenderPass
     private readonly SpriteBatch _spriteBatch;
     private readonly ContentManager _content;
     private RenderTarget2D _albedo;
-    private RenderTarget2D _normalsGloss;
-    private RenderTarget2D _specularGlow;
-    private RenderTarget2D _worldSpace;
+    private RenderTarget2D _normals;
+    private RenderTarget2D _specularGloss;
+    private RenderTarget2D _depth;
     private RenderTarget2D _motionVectors;
     
     private TextureCube _cubeMap;
@@ -68,16 +68,18 @@ public class DeferredRenderPass
 
         _albedo = new RenderTarget2D(_graphics.GraphicsDevice, _graphics.PreferredBackBufferWidth,
             _graphics.PreferredBackBufferHeight, false, SurfaceFormat.Color, depthFormat);
-        _normalsGloss = new RenderTarget2D(_graphics.GraphicsDevice, _graphics.PreferredBackBufferWidth,
-            _graphics.PreferredBackBufferHeight, false, SurfaceFormat.HalfVector4, DepthFormat.None);
-        _specularGlow = new RenderTarget2D(_graphics.GraphicsDevice, _graphics.PreferredBackBufferWidth,
+        _normals = new RenderTarget2D(_graphics.GraphicsDevice, _graphics.PreferredBackBufferWidth,
+            _graphics.PreferredBackBufferHeight, false, SurfaceFormat.HalfVector2, DepthFormat.None);
+        _specularGloss = new RenderTarget2D(_graphics.GraphicsDevice, _graphics.PreferredBackBufferWidth,
             _graphics.PreferredBackBufferHeight, false, SurfaceFormat.Color, DepthFormat.None);
-        _worldSpace = new RenderTarget2D(_graphics.GraphicsDevice, _graphics.PreferredBackBufferWidth,
-            _graphics.PreferredBackBufferHeight, false, SurfaceFormat.Vector4, DepthFormat.None);
-        _gather = new RenderTarget2D(_graphics.GraphicsDevice, _graphics.PreferredBackBufferWidth,
-            _graphics.PreferredBackBufferHeight, false, SurfaceFormat.HdrBlendable, DepthFormat.None);
+        _depth = new RenderTarget2D(_graphics.GraphicsDevice, _graphics.PreferredBackBufferWidth,
+            _graphics.PreferredBackBufferHeight, false, SurfaceFormat.Single, DepthFormat.None);
         _motionVectors = new RenderTarget2D(_graphics.GraphicsDevice, _graphics.PreferredBackBufferWidth,
             _graphics.PreferredBackBufferHeight, false, SurfaceFormat.HalfVector2, DepthFormat.None);
+        
+        _gather = new RenderTarget2D(_graphics.GraphicsDevice, _graphics.PreferredBackBufferWidth,
+            _graphics.PreferredBackBufferHeight, false, SurfaceFormat.HdrBlendable, DepthFormat.None);
+      
 
         _samplerState = new SamplerState()
         {
@@ -94,7 +96,7 @@ public class DeferredRenderPass
         DirLight.DrawShadow(models.ToArray());
         DrawDeferredPass(camera, models);
         
-        _ambientOcclusionDrawer.Draw(_normalsGloss, _worldSpace, camera);
+        _ambientOcclusionDrawer.Draw(_normals, _depth, camera);
         if (DebugDrawRenderPasses)
             DrawDebugPasses();
         else
@@ -109,7 +111,7 @@ public class DeferredRenderPass
         _graphicsDevice.SetRenderTarget(_gather);
         _graphicsDevice.Clear(Color.Black);
         _graphicsDevice.BlendState = BlendState.Additive;
-        DirLight.Draw(_albedo, _normalsGloss, _specularGlow, _worldSpace, _ambientOcclusionDrawer.Ao, _cubeMap, camera);
+        DirLight.Draw(_albedo, _normals, _specularGloss, _depth,_ambientOcclusionDrawer.Ao, _cubeMap, camera);
         _graphicsDevice.SetRenderTarget(null);
         //_spriteBatch.Begin();
         //_spriteBatch.Draw(_gather,
@@ -126,7 +128,7 @@ public class DeferredRenderPass
     
     private void DrawDeferredPass(Camera3D camera, List<Model3D> models)
     {
-        _graphicsDevice.SetRenderTargets(_albedo, _normalsGloss, _specularGlow, _worldSpace, _motionVectors);
+        _graphicsDevice.SetRenderTargets(_albedo, _normals, _specularGloss, _depth, _motionVectors);
         _graphicsDevice.Clear(Color.Transparent);
         _graphicsDevice.BlendState = BlendState.Opaque;
         _graphicsDevice.DepthStencilState = DepthStencilState.Default;
@@ -148,11 +150,11 @@ public class DeferredRenderPass
         _spriteBatch.Draw(_albedo,
             Vector2.Zero, null, Color.White, 0, Vector2.Zero,
             new Vector2(0.5f), SpriteEffects.None, 0);
-        _spriteBatch.Draw(_normalsGloss,
+        _spriteBatch.Draw(_normals,
             new Vector2(_graphics.PreferredBackBufferWidth / 2.0f, 0),
             null, Color.White, 0, Vector2.Zero,
             new Vector2(0.5f), SpriteEffects.None, 0);
-        _spriteBatch.Draw(_worldSpace, new Vector2(0, _graphics.PreferredBackBufferHeight / 2.0f),
+        _spriteBatch.Draw(_depth, new Vector2(0, _graphics.PreferredBackBufferHeight / 2.0f),
             null, Color.White, 0, Vector2.Zero,
             new Vector2(0.5f), SpriteEffects.None, 0);
         _spriteBatch.Draw(_ambientOcclusionDrawer.Ao,

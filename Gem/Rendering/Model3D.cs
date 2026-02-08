@@ -64,11 +64,11 @@ public class Model3D
         effect.Parameters["CameraPosition"].SetValue(camera.Transform.Translation);
         effect.Parameters["ModelViewProjection"].SetValue(worldViewProjection);
         effect.Parameters["LastModelViewProjection"].SetValue(_lastWorldViewProjection);
-        effect.Parameters["ModelToWorld"].SetValue(_transform);
+        effect.Parameters["ModelToWorld"].SetValue(_transform * camera.ViewMatrix);
         effect.Parameters["AlbedoTexture"].SetValue(_albedo);
         effect.Parameters["NormalsTexture"].SetValue(_normal);
         effect.Parameters["SpecularGlossTexture"].SetValue(_specularGloss);
-        effect.Parameters["GlowTexture"].SetValue(_glow);
+        //effect.Parameters["GlowTexture"].SetValue(_glow);
         
         foreach (var mesh in _model.Meshes)
         {

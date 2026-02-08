@@ -13,8 +13,8 @@ public class Camera3D
     public float FOV;
     public float OrthoFOV = 100;
     public bool Orthographic = false;
-    private float nearClipPlane = 0.1f;
-    private float farClipPlane = 200;
+    public float NearClipPlane = 0.1f;
+    public float FarClipPlane = 200;
     private Vector3 Rotation;
     private Vector3 Position;
     public Matrix ViewMatrix { get; private set; }
@@ -45,6 +45,7 @@ public class Camera3D
     
     public void Translate(Vector3 moveAmount)
     {
+        
         Position += moveAmount;
     }
 
@@ -75,9 +76,9 @@ public class Camera3D
             float fieldOfView = MathHelper.ToRadians(FOV);
             float aspectRatio = (float)graphicsDevice.Viewport.Width / (float)graphicsDevice.Viewport.Height;
             if (Orthographic)
-                return Matrix.CreateOrthographic(OrthoFOV, OrthoFOV / aspectRatio, nearClipPlane, farClipPlane);
+                return Matrix.CreateOrthographic(OrthoFOV, OrthoFOV / aspectRatio, NearClipPlane, FarClipPlane);
             
-            return Matrix.CreatePerspectiveFieldOfView(fieldOfView, aspectRatio, nearClipPlane, farClipPlane);
+            return Matrix.CreatePerspectiveFieldOfView(fieldOfView, aspectRatio, NearClipPlane, FarClipPlane);
         }
     }
 }

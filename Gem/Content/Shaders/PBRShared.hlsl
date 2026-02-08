@@ -42,18 +42,16 @@ float LightDistribution(float roughness, float3 normal, float3 halfVector)
 }
 
 float3 ShadePixelPBS(float3 lightDirection, float3 viewDirection, float3 lightColor,
-                     float4 albedo, float4 normalGloss, float4 specularGlow)
+                     float4 albedo, float3 n, float3 specular, float gloss)
 {
     //float metallic = 0.95f;
-    float roughness = (1.0f - normalGloss.w);
+    float roughness = (1.0f -gloss);
     float3 h = normalize((lightDirection + viewDirection) * .5f);
-    float3 ks = Fresnel(specularGlow.xyz * roughness, viewDirection, h);
+    float3 ks = Fresnel(specular * roughness, viewDirection, h);
     float kd = (float3(1.0f, 1.0f, 1.0f) - ks);// * (1.0f - metallic);
 
     float3 lambert = albedo.xyz / pi;
-
-    float3 n = normalGloss.xyz;
-
+    
     float lambertShading = saturate(dot(lightDirection, n));
 
     float3 cookTorranceN = LightDistribution(roughness, n, h)

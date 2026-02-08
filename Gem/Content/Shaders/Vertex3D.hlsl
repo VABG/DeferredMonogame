@@ -18,10 +18,9 @@ VertexShaderOutput MainVS(in VertexShaderInput input)
     VertexShaderOutput output;
     float4 pos = mul(float4(input.Position, 1), ModelViewProjection);
     output.Position = pos;
-    // Can't use output.Position for some reason, maybe some haxx exist? Or I misread the valjoos?
     output.CurrentPosition = pos; 
     output.PreviousPosition = mul(float4(input.Position, 1), LastModelViewProjection);
-    output.WorldPosition = mul(float4(input.Position, 1), ModelToWorld).xyz;
+    //output.WorldPosition = mul(float4(input.Position, 1), ModelToWorld).xyz;
     output.TexCoord = input.TexCoord;
     
     float3x3 rotationMatrix = ModelToWorld;

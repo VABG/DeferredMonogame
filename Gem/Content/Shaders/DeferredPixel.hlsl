@@ -1,18 +1,19 @@
 #include "DeferredShared.hlsl"
+#include "NormalsEncodeDecode.hlsl"
 
 struct DeferredTarget
 {
     float4 Albedo : COLOR0;
-    float4 NormalsGloss : COLOR1;
-    float4 SpecularGlow : COLOR2;
-    float4 WorldSpace : COLOR3;
+    float2 Normals : COLOR1;
+    float4 SpecularGloss : COLOR2;
+    float Depth : COLOR3;
     float2 Velocity : COLOR4;
 };
 
 Texture2D AlbedoTexture : register(t0);
 Texture2D NormalsTexture : register(t1);
 Texture2D SpecularGlossTexture : register(t2);
-Texture2D GlowTexture : register(t3);
+//Texture2D GlowTexture : register(t3);
 
 float3 CameraPosition;
 
@@ -31,11 +32,11 @@ DeferredTarget MainPS(VertexShaderOutput input) : SV_Target
         + (bumpMap.z * input.Normal));
     
     float4 specularGloss = SpecularGlossTexture.Sample(Sampler, input.TexCoord);
-    float4 glow =GlowTexture.Sample(Sampler, input.TexCoord);
-    target.NormalsGloss = float4(bumpNormal.x,bumpNormal.y, bumpNormal.z, specularGloss.a);
-    target.SpecularGlow = float4(specularGloss.r, specularGloss.g, specularGloss.b, glow.r);
-    float d = distance(input.WorldPosition, CameraPosition);
-    target.WorldSpace = float4(input.WorldPosition.xyz, d);
+    //float4 glow =GlowTexture.Sample(Sampler, input.TexCoord);
+    target.Normals.xy = Encode(bumpNormal);
+    //target.Normals.zw = 1.0f;
+    target.SpecularGloss = float4(specularGloss.r, specularGloss.g, specularGloss.b,  specularGloss.a);
+    target.Depth = input.CurrentPosition.z;
     target.Velocity = (input.CurrentPosition.xy/input.CurrentPosition.w *.5f) - (input.PreviousPosition.xy/input.PreviousPosition.w * .5f);
     return target;
 }
